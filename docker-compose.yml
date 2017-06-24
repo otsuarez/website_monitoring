@@ -1,0 +1,63 @@
+version: '2'
+volumes:
+  prometheus_data: {}
+  alertmanager_data: {}
+  etc_data: {}
+  grafana_data: {}
+services:
+  prometheus:
+    image: prom/prometheus:v1.7.1
+    # container_name: prometheus
+    stdin_open: true
+    volumes:
+    - etc_data:/etc/prometheus/
+    - prometheus_data:/prometheus
+    tty: true
+    links:
+    - alertmanager:alertmanager
+    - beeping:beeping
+    - node-exporter:node-exporter
+    ports:
+    - 9090:9090/tcp
+    command:
+    - -config.file=/etc/prometheus/prometheus.yml
+    - -storage.local.path=/prometheus
+    - -alertmanager.url=http://alertmanager:9093
+    labels:
+      io.rancher.scheduler.affinity:host_label: main_prom=true
+  alertmanager:
+    image: prom/alertmanager:v0.7.1
+    volumes:
+    - etc_data:/etc/prometheus/
+    - alertmanager_data:/alertmanager
+    #- '-web.external-url=http://147.75.194.53:9093'    
+    ports:
+    - 9093:9093/tcp
+    command:
+    - -config.file=/etc/prometheus/alertmanager.yml
+    - -storage.path=/alertmanager
+  node-exporter:
+    image: prom/node-exporter:v0.14.0
+    ports:
+    - 9100:9100/tcp
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    stdin_open: true
+    tty: true
+    # network_mode: "host"
+  grafana:
+    image: grafana/grafana:4.3.2
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+  beeping:
+    image: otsuarez/beeping_exporter:latest
+    ports:
+      - 9118:9118
+    env_file:
+      - beeping_exporter.env

@@ -1,0 +1,61 @@
+route:  
+#  #group_wait: 30s
+  #group_interval: 5m
+  #repeat_interval: 4h
+  # it was 15s for both:
+ group_wait: 15s
+ group_interval: 3m
+ repeat_interval: 1h
+ # group_by: [dc]
+ group_by: ['alertname', 'dc']
+ # If an alert isn't caught by a route, send it slack.
+ receiver: slack_general
+ routes:
+  # Send severity=slack alerts to slack.
+  - match:
+      severity: warning
+    receiver: warning_notifications
+    # slack_general
+  - match:
+      severity: critical
+    receiver: critical_notifications
+
+receivers:
+- name: slack_general
+  slack_configs:
+  - api_url: https://hooks.slack.com/services/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
+    channel: '#general'
+    title: '{{ template "slack.beeping.title" . }}'
+    text: 'Sites: {{ range .Alerts }}{{ .Labels.site }} {{ end }}'
+    send_resolved: True
+
+# send warning to private channel
+- name: warning_notifications
+  slack_configs:
+  - api_url: https://hooks.slack.com/services/
+    channel: '#syslog'
+    title: '{{ template "slack.beeping.title" . }}'
+    text: 'Sites: {{ range .Alerts }}{{ .Labels.site }} {{ end }}'
+    send_resolved: True
+
+# send critical to public channel in slack and cellphone
+- name: critical_notifications
+  slack_configs:
+  - api_url: https://hooks.slack.com/services/
+    channel: '#general'
+    title: '{{ template "slack.beeping.title" . }}'
+    text: 'Sites: {{ range .Alerts }}{{ .Labels.site }} {{ end }}'
+    send_resolved: True
+  # pushover_configs:
+  # - user_key: 
+  #   token: 
+  #   send_resolved: True
+
+#- name: webhooks_general
+#  webhook_configs:
+#  - url: http://requestb.in/q7bbyrq7
+
+
+templates:
+ - '/etc/prometheus/beeping_alert_template.tmpl'
+

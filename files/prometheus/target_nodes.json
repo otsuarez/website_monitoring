@@ -1,0 +1,14 @@
+[
+  {
+    "targets": [ "node-exporter:9100" ],
+    "labels": {
+      "env": "local", "dc": "vm", "job" : "node", "component" : "host", "instance" : "localhost"
+    }
+  },
+  {
+    "targets": [ "beeping:9118" ],
+    "labels": {
+      "env": "local", "dc": "vm", "job" : "beeping", "component" : "beeping", "instance" : "mbp.local"
+    }
+  }
+]

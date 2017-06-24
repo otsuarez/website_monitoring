@@ -1,0 +1,33 @@
+ALERT HTTP_STATUS
+  IF beeping_http_status_code != 200
+  LABELS {severity="critical"}
+  ANNOTATIONS {
+      summary = "HTTP Status code error",
+      description = "{{ $labels.site }} is not 200 OK",
+  }
+
+
+ALERT HTTP_REQUEST_TIME
+  IF beeping_http_request_time_seconds > 1000
+  LABELS {severity="warning"}
+  ANNOTATIONS {
+      summary = "HTTP Request time  alert",
+      description = "{{ $labels.site }} is taking too long to load",
+  }
+
+ALERT cert_expiry_days_left 
+  IF beeping_ssl_cert_expiry_days_left < 30
+  LABELS {severity="warning"}
+  ANNOTATIONS {
+      summary = "SSL Certificate expiration alert. One month left.",
+      description = "{{ $labels.site }} ssl cert is about to expire",
+  }
+
+#
+ALERT cert_expiry_days_left_critical
+  IF beeping_ssl_cert_expiry_days_left < 7
+  LABELS {severity="critical"}
+  ANNOTATIONS {
+      summary = "SSL Certificate expiration alert. One week left.",
+      description = "{{ $labels.site }} ssl cert needs to be renewed ASAP",
+  }

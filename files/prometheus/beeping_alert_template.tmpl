@@ -1,0 +1,38 @@
+{{ define "__alertmanager" }}Beeping{{ end }}
+{{ define "__alertmanagerURL" }}http://localhost:9090/#/alerts{{ end }}
+
+{{ define "__subject_beeping" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}]{{ end }}
+{{ define "__description" }}{{ end }}
+
+{{ define "__text_alert_list" }}{{ range . }}Labels:
+{{ range .Labels.SortedPairs }} - {{ .Name }} = {{ .Value }}
+{{ end }}Annotations:
+{{ range .Annotations.SortedPairs }} - {{ .Name }} = {{ .Value }}
+{{ end }}Source: {{ .GeneratorURL }}
+{{ end }}{{ end }}
+
+
+{{ define "slack.beeping.title" }}{{ template "__subject_beeping" . }}{{ end }}
+
+{{ define "slack.default.username" }}{{ template "__alertmanager" . }}{{ end }}
+{{ define "slack.default.fallback" }}{{ template "slack.default.title" . }} | {{ template "slack.default.titlelink" . }}{{ end }}
+{{ define "slack.default.pretext" }}{{ end }}
+{{ define "slack.default.titlelink" }}{{ template "__alertmanagerURL" . }}{{ end }}
+{{ define "slack.default.iconemoji" }}{{ end }}
+{{ define "slack.default.iconurl" }}{{ end }}
+{{ define "slack.default.text" }}{{ end }}
+
+
+
+{{ define "pushover.default.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "pushover.default.message" }}{{ .CommonAnnotations.SortedPairs.Values | join " " }}
+{{ if gt (len .Alerts.Firing) 0 }}
+Alerts Firing:
+{{ template "__text_alert_list" .Alerts.Firing }}
+{{ end }}
+{{ if gt (len .Alerts.Resolved) 0 }}
+Alerts Resolved:
+{{ template "__text_alert_list" .Alerts.Resolved }}
+{{ end }}
+{{ end }}
+{{ define "pushover.default.url" }}{{ template "__alertmanagerURL" . }}{{ end }}
