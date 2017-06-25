@@ -23,7 +23,7 @@ route:
 receivers:
 - name: slack_general
   slack_configs:
-  - api_url: https://hooks.slack.com/services/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
+  - api_url: https://hooks.slack.com/services/xxx/xxx/xxx
     channel: '#general'
     title: '{{ template "slack.beeping.title" . }}'
     text: 'Sites: {{ range .Alerts }}{{ .Labels.site }} {{ end }}'
