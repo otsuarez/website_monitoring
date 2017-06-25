@@ -63,8 +63,10 @@ For setting up alerts, an incoming webhook needs to be created on Slack.
 #  testing alerts manually
 
 ```
-curl -d '[{"labels": {"alertname": "warning alert", "severity": "warning","site":"example.org"}}]' http://localhost:9093/api/v1/alerts
-curl -d '[{"labels": {"alertname": "critical alert", "severity": "critical","site":"example.com"}}]' http://localhost:9093/api/v1/alerts
+curl -d '[{"labels": {"alertname": "warning alert", "severity": "warning","site":"example.org"}}]' \
+ http://localhost:9093/api/v1/alerts
+curl -d '[{"labels": {"alertname": "critical alert", "severity": "critical","site":"example.com"}}]' \
+ http://localhost:9093/api/v1/alerts
 ```
 
 # bonus point
